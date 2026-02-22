@@ -155,3 +155,109 @@ If you want to read or edit the code, here are the core entry points for each se
 - **Technology Stack**: Python, FastAPI.
 - **Entry Point File**: `app.py`.
 - **Logic**: It exposes a single POST endpoint `/predict` which takes a `{"crop": "name", "region": "name"}` JSON standard and mathematically calculates randomized baseline pricing trends to simulate AI behavior.
+
+---
+
+## 🛑 Stopping the Applications
+
+When you are done testing, you must stop the servers to free up your computer's resources and ports.
+
+**For all Operating Systems (Windows, Mac, Linux):**
+
+1. Go to the terminal window where the application is running.
+2. Press **`Ctrl + C`** on your keyboard.
+3. If it asks "Terminate batch job (Y/N)?", type `Y` and press Enter.
+
+Do this for all three terminal windows (Frontend, Backend, and AI Service).
+
+---
+
+## 🔌 Troubleshooting: "Port Already in Use"
+
+If you try to start a service and get an error saying `Port 8080 is already in use` or `Address already in use`, it means the service from a previous session didn't close properly, or another app is using that port.
+
+### On Windows
+
+1. Open a new terminal as Administrator.
+2. Find the Process ID (PID) using the port (e.g., if port 8080 is blocked):
+
+   ```bash
+   netstat -ano | findstr :8080
+   ```
+
+3. Look for the number in the final column of the output (e.g., `12345`). That is the PID.
+4. Kill the process forcefully:
+
+   ```bash
+   taskkill /PID 12345 /F
+   ```
+
+### On Mac/Linux
+
+1. Open a terminal.
+2. Find the Process ID (PID) using the port:
+
+   ```bash
+   lsof -i :8080
+   ```
+
+3. Kill the process:
+
+   ```bash
+   kill -9 <PID>
+   ```
+
+---
+
+## 🧪 Testing APIs via Postman
+
+If you are a backend developer and want to verify the REST APIs independent of the React UI, you can use **Postman**.
+
+### 1. Market Prices Endpoint (GET)
+
+- **URL**: `http://localhost:8080/api/market/prices`
+- **Method**: GET
+- **Description**: Fetches all mock live market prices currently in the database.
+- **Test**: Open Postman, paste the URL, set to GET, and hit Send. Expect a JSON array of crops and prices.
+
+### 2. Produce Listings Endpoint (GET)
+
+- **URL**: `http://localhost:8080/api/marketplace/listings`
+- **Method**: GET
+- **Description**: Fetches all current farmer listings.
+- **Test**: Send a GET request. Initially, this might be empty `[]` until a Farmer posts something.
+
+### 3. Create Produce Listing (POST)
+
+- **URL**: `http://localhost:8080/api/marketplace/list`
+- **Method**: POST
+- **Headers**: `Content-Type: application/json`
+- **Body** (Raw JSON):
+
+  ```json
+  {
+    "farmerName": "Jane Doe",
+    "crop": "Potato",
+    "quantityKg": 200,
+    "expectedPricePerKg": 15.5,
+    "location": "Nashik Market"
+  }
+  ```
+
+- **Test**: Send the POST request. You should receive the saved object back with an assigned `id`. You can then call the GET API above to verify it was saved successfully.
+
+### 4. AI Price Predictor (POST)
+
+- **URL**: `http://localhost:8000/predict`
+- **Method**: POST
+- **Headers**: `Content-Type: application/json`
+- **Body** (Raw JSON):
+
+  ```json
+  {
+    "crop": "Tomato",
+    "region": "Local"
+  }
+  ```
+
+- **Test**: Send the POST request. Expect a `predicted_trend_7_days` array back in the JSON response simulating upcoming market variations.
